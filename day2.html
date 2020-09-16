@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Day 2</title>
+<style>
+    *{
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body{
+        height: 800px;
+        width: 1140px;
+        background-color: azure;
+    }
+    #clock{
+       border: 3px solid black;
+       background-color: #FFFFFF;
+       height: 500px;
+       border-radius:50%;
+       width: 500px;
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+    }
+    .hand{
+        transition: all 0.5s;
+        transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+    }
+    #hourhand{
+        width: 170px;
+        height: 6px;
+        background-color: black;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transform: skewX(20deg);
+        transform-origin: 0% 50%;
+        transform: rotate(270deg);
+
+    }
+    #minhand{
+        width: 230px;
+        height: 4px;
+        background-color: black;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transform-origin: 0% 50%;
+        transform: rotate(270deg);
+        
+    }
+    #sechand{
+        width: 240px;
+        height: 2px;
+        background-color: red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transform-origin: 0% 50%;
+        transform: rotate(270deg);
+        
+    }
+    
+
+</style>
+</head>
+<body>
+    <div id="clock">
+        <div id="clockface">
+            <div id="hourhand" class="hand"></div>
+            <div id="minhand" class="hand"></div>
+            <div id="sechand" class="hand"></div>
+        </div>
+    </div>
+<script>
+    let secondHandElement = document.getElementById("sechand");
+    let minuteHandElement = document.getElementById("minhand");
+    let hourHandElement = document.getElementById("hourhand");
+    let secondHand = window.getComputedStyle(secondHandElement, null);
+    let minHand = window.getComputedStyle(minuteHandElement, null);
+    let hourHand = window.getComputedStyle(hourHandElement, null);
+
+    let clock = setTimeout(function recursive(){
+        let secondDegree = calcDeg(secondHand.getPropertyValue("transform"));
+        let minDegree = calcDeg(minHand.getPropertyValue("transform"));
+        
+        secondHandElement.style.transform = `rotate(${secondDegree}deg)`;
+        //console.log(secondDegree);
+        if(secondDegree == -90){
+            minuteHandElement.style.transform = `rotate(${minDegree}deg)`;
+        } 
+        if(minDegree == -90){
+            let hourDegree = calcDeg(hourHand.getPropertyValue("transform"));
+            hourHandElement.style.transform = `rotate(${hourDegree}deg)`;
+        }
+        setTimeout(recursive, 1000);
+    },1000);
+
+
+    //calculates the matrix returned from getPropertyValue("transform") into a angle and add 6 degree to move hand forward
+    function calcDeg(tr){
+        var values = tr.split('(')[1];
+        values = values.split(')')[0];
+        values = values.split(',');
+        
+        var a = values[0];
+        var b = values[1];
+        var c = values[2];
+        var d = values[3];
+
+        var scale = Math.sqrt(a*a + b*b);
+
+        // arc sin, convert from radians to degrees, round
+        var sin = b/scale;
+        var angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+    
+        //Every 6 deg == 1 second tick on the clock
+        // works!
+        return angle + 6;
+    }
+</script>
+</body>
+</html>
